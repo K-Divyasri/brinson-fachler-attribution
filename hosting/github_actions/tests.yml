@@ -1,0 +1,63 @@
+# GitHub Actions workflow for the Brinson-Fachler attribution project.
+#
+# What this does: every push and every pull request, GitHub spins up a fresh
+# Linux machine, installs the exact dependencies from requirements.txt, and
+# runs the full pytest suite against build_from_scratch/. Pass -> green check
+# on the commit. Fail -> red X and a log to read. Free on public repos.
+#
+# It is KEYLESS -- there is nothing here that needs one. Every number in this
+# project comes from synthetic data generated in-process from a fixed seed
+# (attribution/data.py), and every test is pure offline math (reconciliation
+# identities, hand-computed golden examples). No network calls, no database,
+# no external service, no API key anywhere in the codebase.
+#
+# WHERE THIS FILE GOES: copy it to ".github/workflows/tests.yml" at the ROOT
+# of your repo. This project publishes the WHOLE project folder (with
+# build_from_scratch/ as a subfolder, same shape as the rest of this learning
+# repo) -- that's why the steps below run inside build_from_scratch via
+# "working-directory".
+
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    # A standard, free Linux box. The package is pure Python (stdlib math,
+    # streamlit, plotly, pytest), so it passes here the same as on Windows.
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: build_from_scratch
+
+    steps:
+      # Step 1: pull the repo's code onto the runner.
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # Step 2: install Python. Pin a version so CI matches local dev.
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: build_from_scratch/requirements.txt
+
+      # Step 3: install the project's dependencies. requirements.txt already
+      # includes pytest, so this one install is everything the suite needs.
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      # Step 4: run the offline smoke test -- a quick end-to-end sanity check
+      # (single-period, linked, and risk attribution, each asserting its own
+      # reconciliation identity) before the full suite runs.
+      - name: Run smoke test
+        run: python smoke_test.py
+
+      # Step 5: run the tests. All 20 are pure offline math on synthetic data
+      # -- no server, no subprocess, no network, no key. Expect 20 passed.
+      - name: Run tests (offline, no API key)
+        run: python -m pytest -q
