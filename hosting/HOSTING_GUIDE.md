@@ -1,6 +1,6 @@
 # Hosting the Brinson-Fachler dashboard
 
-The app is a single Streamlit file (`build_from_scratch/app.py`) with no database,
+The app is a single Streamlit file (`app.py`) with no database,
 no API keys, and no external service calls -- every number on screen comes from
 synthetic data generated in-process (`attribution/data.py`). That makes hosting
 close to the easiest case there is: no secrets to configure, no persistent storage,
@@ -45,14 +45,14 @@ git push -u origin main
 ```
 
 This makes `41-brinson-fachler-attribution/` the repo root, with the real code
-one level down in `build_from_scratch/` -- the same shape used across this whole
-learning repo. Every path below assumes that shape.
+right at the top level (`app.py`, `attribution/`, `requirements.txt`). Every path
+below assumes that shape.
 
 **If you instead push the entire `learning` folder as one big monorepo** (every
 numbered project in one repo), the same steps work, but every path you type into
 a hosting provider's UI needs the extra prefix:
-`41-brinson-fachler-attribution/build_from_scratch/app.py` instead of just
-`build_from_scratch/app.py`. Streamlit Community Cloud in particular looks for
+`41-brinson-fachler-attribution/app.py` instead of just
+`app.py`. Streamlit Community Cloud in particular looks for
 `requirements.txt` in the same directory as the app file first; if it ever fails
 to resolve dependencies in a monorepo layout, the fallback is copying
 `requirements.txt` to the true repo root as well (harmless duplication, not a
@@ -70,11 +70,11 @@ Free, hosted by the makers of Streamlit itself, no credit card.
    - **Repository**: `YOURNAME/brinson-fachler-attribution` (or whatever you
      named it)
    - **Branch**: `main`
-   - **Main file path**: `build_from_scratch/app.py` (or, if you pushed the
+   - **Main file path**: `app.py` (or, if you pushed the
      whole `learning` monorepo instead:
-     `41-brinson-fachler-attribution/build_from_scratch/app.py`)
+     `41-brinson-fachler-attribution/app.py`)
 4. Click **Deploy**. First build takes a minute or two -- it reads
-   `build_from_scratch/requirements.txt` (`streamlit>=1.32`, `plotly>=5.20`,
+   `requirements.txt` (`streamlit>=1.32`, `plotly>=5.20`,
    `pytest>=8.0`), installs them, and starts the app.
 5. You get a URL like `https://yourname-brinson-fachler-attribution.streamlit.app`.
    Put it in your GitHub repo description and the root `README.md`.
@@ -96,14 +96,13 @@ Also free, also no Docker knowledge required.
 2. Click your profile -> **New Space**.
 3. Give it a name, pick **Streamlit** as the Space SDK, choose **Public** visibility.
 4. HF creates a small git repo for the Space. Either:
-   - Push this project's `build_from_scratch/` contents (app.py, requirements.txt,
+   - Push this repo's contents (app.py, requirements.txt,
      attribution/, .streamlit/) straight into the Space repo's root, or
    - Clone the Space repo locally and copy the files in, then `git add . && git
      commit -m "Add app" && git push`.
 5. HF Spaces looks for `app.py` and `requirements.txt` at the Space repo's root by
-   default -- that's why the contents of `build_from_scratch/` (not the whole
-   project folder) go directly into the Space repo, unlike Streamlit Cloud which
-   can point at a subfolder of a larger repo.
+   default -- that's why this repo's contents go directly into the Space repo's
+   root, unlike Streamlit Cloud which can point at a subfolder of a larger repo.
 6. The Space builds automatically on push. Visit
    `https://huggingface.co/spaces/YOURNAME/YOURSPACE` once it says **Running**.
 
@@ -137,16 +136,16 @@ trusting this Dockerfile; it's cited here as a verified fact, not a claim to
 re-check. Feel free to re-run it anyway if you want to see it locally first, or
 after you change `requirements.txt` or `app.py`.
 
-Because the Dockerfile already lives permanently inside `build_from_scratch/`
+Because the Dockerfile already lives permanently at the repo root
 (unlike some other projects on this track, nothing needs to be copied in first),
-deploying is just pointing a host at that subfolder:
+deploying is just pointing a host at the repo:
 
 ### Render (matches the rest of this learning repo's convention)
 
 1. Sign up free at https://render.com (sign in with GitHub, no card needed).
 2. **New** -> **Web Service**, connect your repo.
-3. Set **Root Directory** to `build_from_scratch` (or
-   `41-brinson-fachler-attribution/build_from_scratch` if you pushed the whole
+3. Leave **Root Directory** blank, i.e. the repo root (or set it to
+   `41-brinson-fachler-attribution` if you pushed the whole
    monorepo). Runtime: **Docker**. Render finds the `Dockerfile` there.
 4. Leave the health-check path as `/_stcore/health` (or set it explicitly) --
    this is the one Streamlit route that actually returns 200, matching what was
@@ -163,7 +162,7 @@ of no traffic and take 30-60 seconds to wake back up on the next request.
 
 1. Sign up free at https://railway.app (GitHub sign-in).
 2. **New Project** -> **Deploy from GitHub repo**.
-3. In the service settings, set the **Root Directory** to `build_from_scratch`
+3. In the service settings, leave the **Root Directory** at the repo root
    (same monorepo caveat as above). Railway auto-detects the Dockerfile.
 4. Railway also injects `PORT` automatically -- the Dockerfile already handles it.
 5. Deploy, then open the generated `*.up.railway.app` URL.
@@ -172,10 +171,9 @@ of no traffic and take 30-60 seconds to wake back up on the next request.
 
 1. Install the Fly CLI (https://fly.io/docs/flyctl/install/) and run `fly auth
    signup` (or `fly auth login` if you already have an account).
-2. From `build_from_scratch/`:
+2. From the repo root:
 
    ```powershell
-   cd build_from_scratch
    fly launch
    ```
 
@@ -198,14 +196,14 @@ of no traffic and take 30-60 seconds to wake back up on the next request.
 
 The only thing that ever needs to exist alongside the app is
 `requirements.txt` and (optionally, for the Streamlit theme) `.streamlit/config.toml`
--- both already present in `build_from_scratch/`.
+-- both already present at the repo root.
 
 ## Troubleshooting
 
 - **"ModuleNotFoundError: No module named 'attribution'"** -- the app was started
   from the wrong working directory, or the host's root directory setting points
   one level too high or low. `app.py` imports `attribution.*` as a sibling
-  package, so the process's working directory must be `build_from_scratch/`
+  package, so the process's working directory must be the repo root
   itself.
 - **Streamlit Cloud can't find requirements.txt** -- almost always the monorepo
   path issue described above. Copy `requirements.txt` to the actual repo root as

@@ -3,7 +3,7 @@
 This project's "definition of done" for shipping the dashboard somewhere public.
 Walk it top to bottom. Do not tick a box you have not actually verified by running
 the command -- "should work" is not the same as "works." Commands assume you are
-inside `build_from_scratch/` unless noted.
+at the repo root unless noted.
 
 ## Runs locally, offline
 
@@ -18,9 +18,9 @@ inside `build_from_scratch/` unless noted.
 
 ## Config files present
 
-- [ ] `build_from_scratch/requirements.txt` exists and pins real, installable
+- [ ] `requirements.txt` exists and pins real, installable
       versions (`streamlit>=1.32`, `plotly>=5.20`, `pytest>=8.0`).
-- [ ] `build_from_scratch/.streamlit/config.toml` exists (headless server mode,
+- [ ] `.streamlit/config.toml` exists (headless server mode,
       usage-stats gathering off, theme set).
 - [ ] If deploying from a monorepo (the whole `learning` folder as one repo, not
       just this project), a copy of `requirements.txt` exists at the true repo
@@ -32,7 +32,7 @@ inside `build_from_scratch/` unless noted.
 - [ ] No API key, token, or credential is referenced anywhere in
       `attribution/` or `app.py`. There shouldn't be one to find: every dataset
       is synthetic, generated in-process from a fixed seed.
-- [ ] No `.env` file exists in `build_from_scratch/`, and none is required.
+- [ ] No `.env` file exists at the repo root, and none is required.
 - [ ] No entries needed in any host's "secrets" / "environment variables" panel
       (Streamlit Cloud's Advanced Settings, HF Spaces' Settings tab, Render's
       Environment tab, etc.) -- leave them empty.
@@ -45,7 +45,7 @@ inside `build_from_scratch/` unless noted.
       (no custom code needed -- it ships with Streamlit itself).
 - [ ] **Already verified on this machine**: `curl http://localhost:8501/_stcore/health`
       returned **HTTP 200** against the container built from
-      `build_from_scratch/Dockerfile` (see CANON section 3 / `HOSTING_GUIDE.md`).
+      the repo-root `Dockerfile` (see CANON section 3 / `HOSTING_GUIDE.md`).
       Not something you need to re-run to trust -- only re-verify if you change
       `app.py` or the Dockerfile.
 - [ ] Any Docker host's health-check path setting points at `/_stcore/health`
@@ -53,8 +53,8 @@ inside `build_from_scratch/` unless noted.
 
 ## Docker (if using the container path)
 
-- [ ] `docker build -t brinson-fachler .` succeeds from inside
-      `build_from_scratch/` (Dockerfile already lives there permanently -- no
+- [ ] `docker build -t brinson-fachler .` succeeds from the
+      repo root (Dockerfile already lives there permanently -- no
       copy-in step needed, unlike some other projects on this track).
 - [ ] `docker run -p 8501:8501 brinson-fachler` starts cleanly with no
       traceback in the logs.
@@ -77,8 +77,8 @@ inside `build_from_scratch/` unless noted.
 - [ ] `.github/workflows/tests.yml` (copied from
       `hosting/github_actions/tests.yml`) is committed and pushed.
 - [ ] The Actions tab shows a completed green run: install
-      `build_from_scratch/requirements.txt`, then `pytest -q` inside
-      `build_from_scratch/`, reporting **20 passed**.
+      `requirements.txt`, then `pytest -q` from the repo root,
+      reporting **20 passed**.
 - [ ] No secret is configured on the repo for this workflow, and none is needed
       -- every test is pure offline math on synthetic data.
 

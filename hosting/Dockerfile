@@ -1,10 +1,10 @@
-# Exact copy of build_from_scratch/Dockerfile, kept here for reference and for
+# Exact copy of the repo-root Dockerfile, kept here for reference and for
 # hosting providers that expect a Dockerfile at a predictable, documented path.
 # Unlike some other projects on this track, nothing needs to be copied INTO
-# build_from_scratch/ before building -- this Dockerfile already lives there
+# the repo root before building -- the root Dockerfile already lives there
 # permanently as part of the shipped, pytest-verified package (see
-# build_from_scratch/README.md's project-structure listing). If the two files
-# ever drift, build_from_scratch/Dockerfile is the one that's authoritative;
+# README.md's project-structure listing). If the two files
+# ever drift, the repo-root Dockerfile is the one that's authoritative;
 # update this copy to match.
 #
 # Already verified on this machine (see CANON section 3 / HOSTING_GUIDE.md):

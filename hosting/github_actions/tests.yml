@@ -2,7 +2,7 @@
 #
 # What this does: every push and every pull request, GitHub spins up a fresh
 # Linux machine, installs the exact dependencies from requirements.txt, and
-# runs the full pytest suite against build_from_scratch/. Pass -> green check
+# runs the full pytest suite against this repo. Pass -> green check
 # on the commit. Fail -> red X and a log to read. Free on public repos.
 #
 # It is KEYLESS -- there is nothing here that needs one. Every number in this
@@ -12,10 +12,8 @@
 # no external service, no API key anywhere in the codebase.
 #
 # WHERE THIS FILE GOES: copy it to ".github/workflows/tests.yml" at the ROOT
-# of your repo. This project publishes the WHOLE project folder (with
-# build_from_scratch/ as a subfolder, same shape as the rest of this learning
-# repo) -- that's why the steps below run inside build_from_scratch via
-# "working-directory".
+# of your repo. This repo's root is the project itself (no subfolder), so the
+# steps below run from the repo root and need no "working-directory".
 
 name: tests
 
@@ -29,10 +27,6 @@ jobs:
     # streamlit, plotly, pytest), so it passes here the same as on Windows.
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: build_from_scratch
-
     steps:
       # Step 1: pull the repo's code onto the runner.
       - name: Check out the code
@@ -44,7 +38,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: build_from_scratch/requirements.txt
+          cache-dependency-path: requirements.txt
 
       # Step 3: install the project's dependencies. requirements.txt already
       # includes pytest, so this one install is everything the suite needs.
